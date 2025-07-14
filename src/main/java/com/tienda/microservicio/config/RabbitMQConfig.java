@@ -37,8 +37,8 @@ public class RabbitMQConfig {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setHost("54.85.59.177");
         factory.setPort(5672);
-        factory.setUsername("hola1");
-        factory.setPassword("hola1");
+        factory.setUsername("guest");
+        factory.setPassword("guest");
         return factory;
     }
 
