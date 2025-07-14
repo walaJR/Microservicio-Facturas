@@ -132,7 +132,7 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
         }
     }
 
-    // @RabbitListener(queues = RabbitMQConfig.MAIN_QUEUE)
+    @RabbitListener(id = "listener-myQueue", queues = RabbitMQConfig.MAIN_QUEUE)
     @Override
     public void recibirMensaje(Object objeto) {
         System.out.println("Mensaje recibido en myQueue: " + objeto);
