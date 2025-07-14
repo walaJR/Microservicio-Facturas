@@ -41,8 +41,8 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
         ConnectionFactory factory = new ConnectionFactory(); // Generamos la conexión a RabbitMQ
 
         factory.setHost("54.85.59.177");
-        factory.setUsername("hola1");
-        factory.setPassword("hola1");
+        factory.setUsername("guest");
+        factory.setPassword("guest");
 
         try (Connection conexion = factory.newConnection(); Channel canal = conexion.createChannel()) {
 
