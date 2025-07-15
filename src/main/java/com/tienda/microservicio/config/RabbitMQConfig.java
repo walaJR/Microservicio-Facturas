@@ -29,8 +29,6 @@ public class RabbitMQConfig {
     public static final String ROUTING_KEY = "compra.routing.key";
     public static final String DLX_ROUTING_KEY = "dlx-routing-key";
 
-    @Autowired
-    private RabbitAdmin rabbitAdmin;
 
     @Bean
     Jackson2JsonMessageConverter messageConverter() {
@@ -101,21 +99,33 @@ public class RabbitMQConfig {
 
     @EventListener(ApplicationReadyEvent.class)
     public void inicializarRabbitMQ() {
+        System.out.println("=== Iniciando configuración manual de RabbitMQ ===");
+        
         try {
-            System.out.println("=== Iniciando configuración manual de RabbitMQ ===");
-
+            // Obtener el RabbitAdmin del contexto de aplicación
+            RabbitAdmin admin = rabbitAdmin(connectionFactory());
+            
+            // Intentar conexión paso a paso
+            System.out.println("Intentando conectar a RabbitMQ en 54.85.59.177:5672...");
+            
             // Forzar la declaración de todos los beans
-            rabbitAdmin.initialize();
-
-            System.out.println("RabbitMQ: Colas, exchanges y bindings creados correctamente");
+            admin.initialize();
+            
+            System.out.println("RabbitMQ: Conexión exitosa y configuración completada");
             System.out.println("Cola principal: " + MAIN_QUEUE);
             System.out.println("Cola DLX: " + DLX_QUEUE);
             System.out.println("Exchange principal: " + MAIN_EXCHANGE);
             System.out.println("Exchange DLX: " + DLX_EXCHANGE);
-
+            
         } catch (Exception e) {
-            System.err.println("Error al inicializar RabbitMQ: " + e.getMessage());
+            System.err.println("ERROR CRÍTICO: No se pudo inicializar RabbitMQ");
+            System.err.println("Mensaje de error: " + e.getMessage());
+            System.err.println("Tipo de excepción: " + e.getClass().getSimpleName());
             e.printStackTrace();
+            
+            // NO lanzar la excepción para que la aplicación siga funcionando
+            System.out.println("La aplicación continuará sin RabbitMQ inicializado");
+            System.out.println("Verifica la conectividad de red y configuración de RabbitMQ");
         }
     }
 
