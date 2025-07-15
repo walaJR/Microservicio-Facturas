@@ -11,8 +11,11 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
 @Configuration
 @EnableRabbit
@@ -24,6 +27,9 @@ public class RabbitMQConfig {
     public static final String DLX_EXCHANGE = "dlx-exchange";
     public static final String ROUTING_KEY = "compra.routing.key";
     public static final String DLX_ROUTING_KEY = "dlx-routing-key";
+
+    @Autowired
+    private RabbitAdmin rabbitAdmin;
 
     @Bean
     Jackson2JsonMessageConverter messageConverter() {
@@ -90,6 +96,26 @@ public class RabbitMQConfig {
     Binding dlxBinding() {
 
         return BindingBuilder.bind(dlxQueue()).to(dlxExchange()).with(DLX_ROUTING_KEY);
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void inicializarRabbitMQ() {
+        try {
+            System.out.println("=== Iniciando configuración manual de RabbitMQ ===");
+
+            // Forzar la declaración de todos los beans
+            rabbitAdmin.initialize();
+
+            System.out.println("RabbitMQ: Colas, exchanges y bindings creados correctamente");
+            System.out.println("Cola principal: " + MAIN_QUEUE);
+            System.out.println("Cola DLX: " + DLX_QUEUE);
+            System.out.println("Exchange principal: " + MAIN_EXCHANGE);
+            System.out.println("Exchange DLX: " + DLX_EXCHANGE);
+
+        } catch (Exception e) {
+            System.err.println("Error al inicializar RabbitMQ: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 }
